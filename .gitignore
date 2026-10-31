@@ -1,0 +1,120 @@
+
+# =============================================
+# SPRING BOOT / JAVA / MAVEN
+# =============================================
+
+# Maven build output
+target/
+
+# Java compiled files
+*.class
+
+# Spring Boot local configurations
+backend/src/main/resources/application-local.yml
+backend/src/main/resources/application-local.yaml
+backend/src/main/resources/application-local.properties
+
+# =============================================
+# REACT / TYPESCRIPT / VITE
+# =============================================
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Testing
+coverage/
+
+# Cache
+.vite/
+.cache/
+*.tsbuildinfo
+
+# =============================================
+# ENVIRONMENT VARIABLES / SECRETS
+# =============================================
+
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Local secret directories
+secrets/
+
+# =============================================
+# IDE / EDITOR
+# =============================================
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+
+# Eclipse / STS
+.project
+.classpath
+.settings/
+.factorypath
+
+# =============================================
+# LOGS / TEMPORARY FILES
+# =============================================
+
+*.log
+logs/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# =============================================
+# OPERATING SYSTEM
+# =============================================
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# =============================================
+# DATABASE / LOCAL STORAGE
+# =============================================
+
+# SQL Server database files
+*.mdf
+*.ldf
+
+# Database backups
+*.bak
+*.dump
+
+# Application-generated uploads
+backend/uploads/
+backend/storage/
+
+# Local Docker volume data
+infra/local-data/
