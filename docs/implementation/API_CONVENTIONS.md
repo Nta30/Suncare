@@ -1,0 +1,12 @@
+# REST contract conventions (implementation guide; not a replacement for domain documents)
+
+- Prefix `/api/v1`; plural resources, noun endpoints for queries. Business transitions are named POST commands (`/cancel`, `/publish`, `/start`, `/complete`, etc.) with server-side state-machine enforcement. No generic endpoint allowing client to choose any status.
+- Requests/responses use JSON; validate required/nullable data, length, enums and date windows. IDs are stable database IDs; show user-facing immutable code separately where needed. Never trust client-supplied role, patient ownership, price, doctor auto-allocation or department scope.
+- Dates: ISO 8601 UTC instants in API (`...Z`); UI uses Asia/Saigon. Date-only work_date uses `YYYY-MM-DD`; queries for date ranges are translated using local midnight half-open bounds.
+- Money: JSON decimal **strings** such as `"150000"`; backend Java BigDecimal, SQL decimal(19,0); preserve precision in JS. Do not return formatted VND in numeric fields.
+- Recommended errors: 400 input syntax, 401 unauthenticated, 403 forbidden, 404 not found or hide unowned record, 409 state/capacity/idempotency conflict, 422 domain validation, 429 throttled, 500 unexpected (redacted). Use a stable ProblemDetail-style JSON with `type`, `title`, `status`, `detail`, `code`, `correlationId` and optional sanitized `fieldErrors`.
+- Pagination: bounded `page`/`size` and stable sort; prefer deterministic business keys for large exports. Validate/scope all filters on server. No raw medical data by default in exports.
+- For retriable mutation commands: `Idempotency-Key` header; server scopes key by principal/command type, checks payload hash, and persists CommandReceipt with the business transaction. Same key + different body => 409. Rate-limiting and duplicate checks are separate.
+- OpenAPI is contract of record after approval. Backend owns generated contract; frontend uses checked/verified endpoint DTOs and a single REST client. Do not edit API docs while parallel agents implement differing assumptions.
+- Security choice remains gated by task T04. If cookie session chosen, specify and implement CSRF + SameSite + Secure/HttpOnly; if bearer chosen, protect tokens and avoid persistent browser storage. Whichever is selected, verify server-side role changes immediately.
+- Document for each endpoint: actor/permission, record scope, input validation, transaction, lock, state preconditions, error variants, idempotency, and one AT01–AT49 regression reference where applicable.

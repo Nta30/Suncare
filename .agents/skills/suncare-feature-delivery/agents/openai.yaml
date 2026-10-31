@@ -1,0 +1,3 @@
+interface:
+  display_name: "Suncare Feature Delivery"
+  short_description: "Build a scoped Suncare feature with business gates and tests"
