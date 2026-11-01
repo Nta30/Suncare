@@ -28,6 +28,7 @@
 @REM ----------------------------------------------------------------------------
 
 @IF "%__MVNW_ARG0_NAME__%"=="" (SET __MVNW_ARG0_NAME__=%~nx0)
+@IF "%JAVA_HOME%"=="" IF EXIST "C:\Program Files\Java\jdk-21.0.12.1\bin\java.exe" (SET "JAVA_HOME=C:\Program Files\Java\jdk-21.0.12.1")
 @SET __MVNW_CMD__=
 @SET __MVNW_ERROR__=
 @SET __MVNW_PSMODULEP_SAVE=%PSModulePath%
@@ -103,6 +104,13 @@ if (Test-Path -Path "$MAVEN_HOME" -PathType Container) {
   Write-Verbose "found existing MAVEN_HOME at $MAVEN_HOME"
   Write-Output "MVN_CMD=$MAVEN_HOME/bin/$MVN_CMD"
   exit $?
+}
+
+$legacyWrapperBin = Get-ChildItem -Path "$MAVEN_WRAPPER_DISTS/$($distributionUrlName -replace '\.[^.]*$','')/*/$distributionUrlNameMain/bin/$MVN_CMD" -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($legacyWrapperBin) {
+  Write-Verbose "found existing legacy MAVEN_HOME at $($legacyWrapperBin.FullName)"
+  Write-Output "MVN_CMD=$($legacyWrapperBin.FullName)"
+  exit 0
 }
 
 if (! $distributionUrlNameMain -or ($distributionUrlName -eq $distributionUrlNameMain)) {

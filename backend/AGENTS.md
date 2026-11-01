@@ -2,7 +2,7 @@
 
 Read root `AGENTS.md` and the task's sections of docs 03–06 before touching backend code.
 
-- Java 21; Spring Boot with **Spring Web MVC**, Spring Security, Bean Validation, Spring Data JPA for ordinary persistence, and explicit JDBC/SQL where SQL Server lock semantics require it. Use Maven Wrapper if available. Prefer modular monolith packages by domain under `com.suncare` (identity, catalog, scheduling, booking, encounter, clinical, billing, refund, reporting, files, video).
+- Java 21; Spring Boot with **Spring Web MVC**, Spring Security, Bean Validation, Spring Data JPA for ordinary persistence, and explicit JDBC/SQL where SQL Server lock semantics require it. Use Maven Wrapper if available. Prefer modular monolith packages by domain under `vn.suncare` (common, infrastructure, security, identity, catalog, scheduling, booking, encounter, clinical, billing, refund, reporting, files, video).
 - Each domain owns `api` (controller + request/response DTO), `application` (commands/services), `persistence` (entity/repository) as appropriate; put cross-domain policy orchestration in application services, not controllers.
 - Do NOT use `spring.jpa.hibernate.ddl-auto=create`, `update` or `create-drop`. Use `validate` once the database is ready; avoid altering the 58-table SQL schema just to accommodate entity mappings. Map features incrementally.
 - Never write money as `double`, never use enum `ORDINAL`, never compute business codes via MAX(id)+1. SQL Server rowversion and datetime2(3) require explicit mapping/testing; updated_at on UPDATE must be handled.

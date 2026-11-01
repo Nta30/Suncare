@@ -1,18 +1,22 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { AppShell } from '@/app/AppShell'
+import { HomePage } from '@/app/pages/HomePage'
+import { NotFoundPage } from '@/app/pages/NotFoundPage'
+import { SystemStatusPage } from '@/app/pages/SystemStatusPage'
+import { RouterProvider, RouteView } from '@/app/router'
+
+const APP_ROUTES = [
+  { path: '/', element: <HomePage /> },
+  { path: '/system-status', element: <SystemStatusPage /> },
+  { path: '*', element: <NotFoundPage /> },
+]
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="min-h-screen bg-blue-500 flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-white">
-        Suncare Healthcare
-      </h1>
-    </div>
+    <RouterProvider>
+      <AppShell>
+        <RouteView routes={APP_ROUTES} />
+      </AppShell>
+    </RouterProvider>
   )
 }
 
