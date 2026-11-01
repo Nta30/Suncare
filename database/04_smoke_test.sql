@@ -1,5 +1,7 @@
 -- Constraint-level smoke test only, not the backend business acceptance suite.
 -- All test records are rolled back. Run after 01, 02 and 03.
+USE Suncare
+GO
 SET NOCOUNT ON;
 SET QUOTED_IDENTIFIER ON;
 SET ANSI_NULLS ON;

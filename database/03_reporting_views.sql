@@ -1,5 +1,7 @@
 -- Views aggregate each child before joining to avoid multiplying amounts.
 -- These views do NOT implement user authorization. Backend must apply row scope.
+USE Suncare
+GO
 SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
 GO

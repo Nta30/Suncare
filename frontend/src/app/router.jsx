@@ -1,37 +1,41 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { RouterContext } from '@/app/routerContext'
 import { matchRoutePath, normalizeRoutePath } from '@/lib/routeUtils'
-
-const RouterContext = createContext({
-  path: '/',
-  navigate: () => {},
-})
 
 export function RouterProvider({ children }) {
   const [path, setPath] = useState(() =>
     typeof window !== 'undefined' ? normalizeRoutePath(window.location.pathname) : '/'
   )
+  const [routeState, setRouteState] = useState(null)
 
   useEffect(() => {
-    const handlePopState = () => {
+    const handlePopState = (event) => {
       setPath(normalizeRoutePath(window.location.pathname))
+      setRouteState(event.state || null)
     }
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
-  const navigate = useCallback((nextPath) => {
+  const navigate = useCallback((nextPath, options = {}) => {
     const normalized = normalizeRoutePath(nextPath)
-    if (typeof window !== 'undefined' && normalizeRoutePath(window.location.pathname) !== normalized) {
-      window.history.pushState({}, '', normalized)
+    const nextState = options.state || null
+    if (typeof window !== 'undefined') {
+      if (options.replace) {
+        window.history.replaceState(nextState, '', normalized)
+      } else if (normalizeRoutePath(window.location.pathname) !== normalized) {
+        window.history.pushState(nextState, '', normalized)
+      }
     }
+    setRouteState(nextState)
     setPath(normalized)
   }, [])
 
-  const value = useMemo(() => ({ path, navigate }), [path, navigate])
+  const value = useMemo(() => ({ path, routeState, navigate }), [path, routeState, navigate])
   return <RouterContext.Provider value={value}>{children}</RouterContext.Provider>
 }
 
-export function RouteLink({ to, className = '', children }) {
+export function RouteLink({ to, state = null, className = '', children, ...rest }) {
   const { path, navigate } = useContext(RouterContext)
   const target = normalizeRoutePath(to)
   const isActive = path === target
@@ -48,7 +52,7 @@ export function RouteLink({ to, className = '', children }) {
       return
     }
     event.preventDefault()
-    navigate(target)
+    navigate(target, { state })
   }
 
   return (
@@ -57,6 +61,7 @@ export function RouteLink({ to, className = '', children }) {
       onClick={handleClick}
       aria-current={isActive ? 'page' : undefined}
       className={className}
+      {...rest}
     >
       {children}
     </a>
@@ -71,4 +76,3 @@ export function RouteView({ routes }) {
   }
   return matched.element
 }
-

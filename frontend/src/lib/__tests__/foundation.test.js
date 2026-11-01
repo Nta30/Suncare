@@ -3,6 +3,7 @@ import test from 'node:test'
 import { ApiError, createApiClient } from '../apiClient.js'
 import { formatVnd, isValidVndDecimalString, toSaigonWorkDate } from '../formatters.js'
 import { matchRoutePath, normalizeRoutePath } from '../routeUtils.js'
+import '../../features/auth/__tests__/auth.test.js'
 
 test('formatVnd formats large VND decimal strings without precision loss and rejects floats', () => {
   assert.equal(isValidVndDecimalString('150000'), true)

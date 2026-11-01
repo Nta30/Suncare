@@ -1,6 +1,8 @@
 -- Suncare initial schema. SQL Server 2019+; generated from docs/03-tu-dien-du-lieu.md.
 -- Run in an EMPTY database. No DROP/DELETE, no real credentials or patient data.
 -- Business transactions/authorization described in docs/05 remain backend responsibilities.
+USE Suncare
+GO
 SET NOCOUNT ON;
 SET XACT_ABORT ON;
 SET ANSI_NULLS ON;

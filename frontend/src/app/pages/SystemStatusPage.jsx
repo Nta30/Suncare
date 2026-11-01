@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
+import { ProblemAlert } from '@/components/common/ProblemAlert'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
+import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { apiClient, ApiError } from '@/lib/apiClient'
-import { formatSaigonDateTime, formatVnd } from '@/lib/formatters'
+import { formatSaigonDateTime } from '@/lib/formatters'
 
 export function SystemStatusPage() {
   const [state, setState] = useState({
@@ -24,9 +28,9 @@ export function SystemStatusPage() {
           ? err
           : new ApiError({
               status: 0,
-              code: 'UNEXPECTED_CLIENT_ERROR',
-              title: 'Lỗi kiểm tra trạng thái',
-              detail: err instanceof Error ? err.message : 'Không thể kiểm tra kết nối',
+              code: 'NETWORK_ERROR',
+              title: 'Không thể kiểm tra kết nối',
+              detail: err instanceof Error ? err.message : 'Máy chủ tạm thời không phản hồi.',
             })
       setState({ status: 'error', data: null, error: normalizedError })
     }
@@ -51,9 +55,9 @@ export function SystemStatusPage() {
             ? err
             : new ApiError({
                 status: 0,
-                code: 'UNEXPECTED_CLIENT_ERROR',
-                title: 'Lỗi kiểm tra trạng thái',
-                detail: err instanceof Error ? err.message : 'Không thể kiểm tra kết nối',
+                code: 'NETWORK_ERROR',
+                title: 'Không thể kiểm tra kết nối',
+                detail: err instanceof Error ? err.message : 'Máy chủ tạm thời không phản hồi.',
               })
         setState({ status: 'error', data: null, error: normalizedError })
       })
@@ -63,99 +67,63 @@ export function SystemStatusPage() {
   }, [])
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="mx-auto max-w-2xl space-y-6">
+      <Card>
+        <CardHeader className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">
-              Trạng thái kết nối API (`GET /api/v1/health`)
-            </h2>
-            <p className="mt-1 text-sm text-slate-600">
-              Kiểm tra trực tiếp phản hồi từ máy chủ Spring Boot (không chứa dữ liệu bệnh nhân).
+            <p className="text-xs font-semibold uppercase tracking-wider text-teal-700">
+              Hệ thống trực tuyến
             </p>
+            <h2 className="mt-1 text-xl font-bold text-slate-900">
+              Trạng thái dịch vụ Suncare
+            </h2>
           </div>
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="sm"
+            isLoading={state.status === 'loading'}
             onClick={checkHealth}
-            disabled={state.status === 'loading'}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
           >
-            {state.status === 'loading' ? 'Đang kiểm tra...' : 'Kiểm tra lại'}
-          </button>
-        </div>
+            Kiểm tra lại
+          </Button>
+        </CardHeader>
 
-        <div className="mt-6" aria-live="polite">
+        <CardContent aria-live="polite" className="space-y-4">
           {state.status === 'loading' && (
-            <div
-              role="status"
-              className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700"
-            >
-              Đang kết nối tới <code>{apiClient.baseUrl}/health</code>...
-            </div>
+            <p className="text-sm text-slate-600">Đang kiểm tra trạng thái kết nối dịch vụ...</p>
           )}
 
-          {state.status === 'empty' && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-              Máy chủ trả về phản hồi rỗng.
-            </div>
-          )}
-
-          {state.status === 'error' && state.error && (
-            <div
-              role="alert"
-              className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900 space-y-1"
-            >
-              <p className="font-semibold">
-                {state.error.title} ({state.error.code})
-              </p>
-              <p>{state.error.detail}</p>
-              {state.error.correlationId && (
-                <p className="text-xs text-red-700">
-                  Mã tương quan (Correlation ID): <code>{state.error.correlationId}</code>
-                </p>
-              )}
-            </div>
-          )}
+          {state.status === 'error' && <ProblemAlert error={state.error} />}
 
           {state.status === 'success' && state.data && (
-            <dl className="grid gap-4 sm:grid-cols-2 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm">
-              <div>
-                <dt className="text-xs font-medium uppercase text-emerald-800">Trạng thái</dt>
-                <dd className="mt-1 font-bold text-emerald-950">{state.data.status}</dd>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Badge tone="success" dot>
+                  Hệ thống đang hoạt động bình thường
+                </Badge>
               </div>
-              <div>
-                <dt className="text-xs font-medium uppercase text-emerald-800">Dịch vụ</dt>
-                <dd className="mt-1 font-mono text-emerald-950">{state.data.service}</dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium uppercase text-emerald-800">Múi giờ</dt>
-                <dd className="mt-1 text-emerald-950">
-                  Lưu trữ: {state.data.storageTimezone} / Hiển thị: {state.data.displayTimezone}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium uppercase text-emerald-800">
-                  Thời điểm phản hồi (Asia/Saigon)
-                </dt>
-                <dd className="mt-1 text-emerald-950">
-                  {formatSaigonDateTime(state.data.timestamp)}
-                </dd>
-              </div>
-            </dl>
+              <dl className="grid gap-4 sm:grid-cols-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">
+                <div>
+                  <dt className="text-xs font-medium text-slate-500">Trạng thái dịch vụ</dt>
+                  <dd className="mt-1 font-semibold text-slate-900">Sẵn sàng phục vụ</dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-medium text-slate-500">Múi giờ làm việc</dt>
+                  <dd className="mt-1 font-semibold text-slate-900">
+                    {state.data.displayTimezone || 'Asia/Saigon'} (GMT+7)
+                  </dd>
+                </div>
+                <div className="sm:col-span-2">
+                  <dt className="text-xs font-medium text-slate-500">Cập nhật lúc</dt>
+                  <dd className="mt-1 font-medium text-slate-800">
+                    {formatSaigonDateTime(state.data.timestamp)}
+                  </dd>
+                </div>
+              </dl>
+            </div>
           )}
-        </div>
-      </section>
-
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
-        <h3 className="text-base font-semibold text-slate-900">
-          Chuẩn định dạng tiền tệ &amp; thời gian phía Client (DEMO kiểm chứng định dạng)
-        </h3>
-        <p className="mt-1 text-sm text-slate-600">
-          Số tiền VND truyền từ API dưới dạng chuỗi số nguyên được giữ nguyên độ chính xác: ví dụ{' '}
-          <code>&quot;150000&quot;</code> → <strong>{formatVnd('150000')}</strong>.
-        </p>
-      </section>
+        </CardContent>
+      </Card>
     </div>
   )
 }
-
